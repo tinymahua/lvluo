@@ -38,6 +38,9 @@ dependencies:
   rust_lib_lvluo:
     path: rust_builder
   flutter_rust_bridge: 2.5.1
+  bot_toast: ^4.1.3
+  tray_manager: ^0.2.4
+  window_manager: ^0.4.3
 
 dev_dependencies:
   flutter_test:
