@@ -12,6 +12,7 @@ List<NetDevStat> getNetDevStats() =>
 class NetDevStat {
   final BigInt ts;
   final String devId;
+  final String devName;
   final BigInt rxBytes;
   final BigInt txBytes;
   final bool statValid;
@@ -19,6 +20,7 @@ class NetDevStat {
   const NetDevStat({
     required this.ts,
     required this.devId,
+    required this.devName,
     required this.rxBytes,
     required this.txBytes,
     required this.statValid,
@@ -28,6 +30,7 @@ class NetDevStat {
   int get hashCode =>
       ts.hashCode ^
       devId.hashCode ^
+      devName.hashCode ^
       rxBytes.hashCode ^
       txBytes.hashCode ^
       statValid.hashCode;
@@ -39,6 +42,7 @@ class NetDevStat {
           runtimeType == other.runtimeType &&
           ts == other.ts &&
           devId == other.devId &&
+          devName == other.devName &&
           rxBytes == other.rxBytes &&
           txBytes == other.txBytes &&
           statValid == other.statValid;

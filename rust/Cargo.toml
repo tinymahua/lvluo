@@ -4,9 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 flutter_rust_bridge = "=2.5.1"
 anyhow = "1.0.92"
 ifstat-rs = "3.0.0"
+
+[[bin]]
+name = "ifstat-cmd"
+path = "src/bin/ifstat-cmd.rs"

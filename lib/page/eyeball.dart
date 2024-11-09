@@ -12,16 +12,20 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 import "package:async/async.dart" show StreamQueue;
 
-
 class NetDevStatSpeed {
   BigInt ts;
   String devId;
+  String devName;
   BigInt rxBytes;
   BigInt txBytes;
 
-  NetDevStatSpeed({required this.ts, required this.devId, required this.rxBytes, required this.txBytes});
+  NetDevStatSpeed(
+      {required this.ts,
+      required this.devId,
+      required this.devName,
+      required this.rxBytes,
+      required this.txBytes});
 }
-
 
 class EyeballPage extends StatefulWidget {
   const EyeballPage({super.key});
@@ -101,21 +105,23 @@ class _EyeballPageState extends State<EyeballPage>
     await trayManager.setContextMenu(menu);
     await windowManager.setAlignment(Alignment.centerRight, animate: true);
 
-    Timer _refreshNetStatsTimer = Timer.periodic(Duration(milliseconds: 1000), (timer){
+    Timer _refreshNetStatsTimer =
+        Timer.periodic(Duration(milliseconds: 1000), (timer) {
       var _curNetDevStats = getNetDevStats();
       var _curNetDevStatsMap = netDevStatsListToMap(_curNetDevStats);
-      List<Map<String, NetDevStat>> _netDevStatsMapHistory = netDevStatsMapHistory;
-      if (netDevStatsMapHistory.length >= 10){
-        _netDevStatsMapHistory = netDevStatsMapHistory.sublist(netDevStatsMapHistory.length-9, netDevStatsMapHistory.length);
+      List<Map<String, NetDevStat>> _netDevStatsMapHistory =
+          netDevStatsMapHistory;
+      if (netDevStatsMapHistory.length >= 10) {
+        _netDevStatsMapHistory = netDevStatsMapHistory.sublist(
+            netDevStatsMapHistory.length - 9, netDevStatsMapHistory.length);
       }
       _netDevStatsMapHistory.add(_curNetDevStatsMap);
       // if (_netDevStatsMapHistory.length % 4 == 0){
-        setState(() {
-          netDevStatsMapHistory = _netDevStatsMapHistory;
-        });
-        print("netDevStatsMapHistory: ${netDevStatsMapHistory.length}");
+      setState(() {
+        netDevStatsMapHistory = _netDevStatsMapHistory;
+      });
+      print("netDevStatsMapHistory: ${netDevStatsMapHistory.length}");
       // }
-
     });
 
     setState(() {
@@ -123,9 +129,9 @@ class _EyeballPageState extends State<EyeballPage>
     });
   }
 
-  Map<String, NetDevStat> netDevStatsListToMap(List<NetDevStat> netDevStats){
+  Map<String, NetDevStat> netDevStatsListToMap(List<NetDevStat> netDevStats) {
     Map<String, NetDevStat> _map = {};
-    for (NetDevStat _stat in netDevStats){
+    for (NetDevStat _stat in netDevStats) {
       var _key = _stat.devId;
       var _val = _stat;
       _map[_key] = _val;
@@ -133,33 +139,39 @@ class _EyeballPageState extends State<EyeballPage>
     return _map;
   }
 
-  Map<String, NetDevStatSpeed> computeNetSpeed(List<Map<String, NetDevStat>> statMaps){
+  Map<String, NetDevStatSpeed> computeNetSpeed(
+      List<Map<String, NetDevStat>> statMaps) {
     Map<String, NetDevStat> _startStatMap = {};
     Map<String, NetDevStat> _endStatMap = {};
-    if (statMaps.isNotEmpty){
-      if (statMaps.length < 2){
+    if (statMaps.isNotEmpty) {
+      if (statMaps.length < 2) {
         _startStatMap = {};
-        _endStatMap = statMaps[statMaps.length-1];
-      }else{
+        _endStatMap = statMaps[statMaps.length - 1];
+      } else {
         _startStatMap = statMaps[0];
-        _endStatMap = statMaps[statMaps.length-1];
+        _endStatMap = statMaps[statMaps.length - 1];
       }
     }
 
     Map<String, NetDevStatSpeed> _speedMap = {};
-    for (var devId in _endStatMap.keys){
+    for (var devId in _endStatMap.keys) {
       var _endStat = _endStatMap[devId];
       var _startStat = _startStatMap[devId];
       var _rxSpeed = BigInt.zero;
       var _txSpeed = BigInt.zero;
-      if (_endStat != null && _startStat != null){
+      if (_endStat != null && _startStat != null) {
         var _rxDiff = _endStat.rxBytes - _startStat.rxBytes;
         var _txDiff = _endStat.txBytes - _startStat.txBytes;
         var _msNum = _endStat.ts - _startStat.ts;
         _rxSpeed = BigInt.from(_rxDiff * BigInt.from(1000) / _msNum);
         _txSpeed = BigInt.from(_txDiff * BigInt.from(1000) / _msNum);
       }
-      _speedMap[devId] = NetDevStatSpeed(ts: _endStat!.ts, devId: devId, rxBytes: _rxSpeed, txBytes: _txSpeed);
+      _speedMap[devId] = NetDevStatSpeed(
+          ts: _endStat!.ts,
+          devId: devId,
+          devName: _startStat!.devName,
+          rxBytes: _rxSpeed,
+          txBytes: _txSpeed);
     }
 
     return _speedMap;
@@ -184,12 +196,15 @@ class _EyeballPageState extends State<EyeballPage>
 
   Widget buildBody(BuildContext context) {
     List<NetDevStatSpeed> _devSpeeds = [];
-    if (netDevStatsMapHistory.length >= 5){
-      var latestStatsMaps = netDevStatsMapHistory.sublist(netDevStatsMapHistory.length-3, netDevStatsMapHistory.length);
+    if (netDevStatsMapHistory.length >= 5) {
+      var latestStatsMaps = netDevStatsMapHistory.sublist(
+          netDevStatsMapHistory.length - 3, netDevStatsMapHistory.length);
       var _speedMap = computeNetSpeed(latestStatsMaps);
-      _devSpeeds = _speedMap.values.where((e)=>e.rxBytes > BigInt.from(0) || e.txBytes > BigInt.from(0)).toList();
+      _devSpeeds = _speedMap.values
+          .where(
+              (e) => e.rxBytes > BigInt.from(0) || e.txBytes > BigInt.from(0))
+          .toList();
     }
-
 
     return Stack(
       alignment: AlignmentDirectional.centerEnd,
@@ -206,38 +221,57 @@ class _EyeballPageState extends State<EyeballPage>
             width: 300,
             // height: 100,
             child: Padding(
-              padding: const EdgeInsets.all(3),
+              padding: const EdgeInsets.all(8),
               child: Center(
                 child: Container(
                   decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       color: Colors.blue),
                   child: ListView.builder(
-                    itemBuilder: (BuildContext context, int idx){
-                    var _devSpeed = _devSpeeds[idx];
-                    var _rxSpeed = netSpeedFmt(_devSpeed.rxBytes);
-                    var _txSpeed = netSpeedFmt(_devSpeed.txBytes);
-                    return Column(
-                      children: [ RtItem(
-                        itemIcon: Icon(
-                          Icons.arrow_upward,
-                          size: 12,
-                        ),
-                        labelText: "Upload Speed",
-                        infoText: "${formatDouble(_rxSpeed.value, 2)} ${_txSpeed.unitName}/S",
-                      ),
-                        RtItem(
-                          itemIcon: Icon(
-                            Icons.arrow_downward,
-                            size: 12,
+                    itemBuilder: (BuildContext context, int idx) {
+                      var _devSpeed = _devSpeeds[idx];
+                      var _rxSpeed = netSpeedFmt(_devSpeed.rxBytes);
+                      var _txSpeed = netSpeedFmt(_devSpeed.txBytes);
+                      return Column(
+                        children: [
+                          Row(children: [
+                            SizedBox(width: 5,),
+                            Text(
+                              "${_devSpeed.devName}",
+                              style: const TextStyle(
+                                  decoration: TextDecoration.none,
+                                  height: 1.2,
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                          ],),
+                          RtItem(
+                            itemIcon: Icon(
+                              Icons.arrow_upward,
+                              size: 12,
+                            ),
+                            labelText: "Upload Speed",
+                            infoText:
+                                "${formatDouble(_rxSpeed.value, 2)} ${_txSpeed.unitName}/S",
                           ),
-                          labelText: "Download Speed",
-                          infoText: "${formatDouble(_txSpeed.value, 2)} ${_rxSpeed.unitName}/S",
-                        ),
-                        SizedBox(height: 5,),
-                      ],
-                    );
-                  }, itemCount: _devSpeeds.length,),
+                          RtItem(
+                            itemIcon: Icon(
+                              Icons.arrow_downward,
+                              size: 12,
+                            ),
+                            labelText: "Download Speed",
+                            infoText:
+                                "${formatDouble(_txSpeed.value, 2)} ${_rxSpeed.unitName}/S",
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                        ],
+                      );
+                    },
+                    itemCount: _devSpeeds.length,
+                  ),
                 ),
               ),
             ),
@@ -246,5 +280,4 @@ class _EyeballPageState extends State<EyeballPage>
       ],
     );
   }
-
 }

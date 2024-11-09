@@ -230,14 +230,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetDevStat dco_decode_net_dev_stat(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return NetDevStat(
       ts: dco_decode_U128(arr[0]),
       devId: dco_decode_String(arr[1]),
-      rxBytes: dco_decode_u_64(arr[2]),
-      txBytes: dco_decode_u_64(arr[3]),
-      statValid: dco_decode_bool(arr[4]),
+      devName: dco_decode_String(arr[2]),
+      rxBytes: dco_decode_u_64(arr[3]),
+      txBytes: dco_decode_u_64(arr[4]),
+      statValid: dco_decode_bool(arr[5]),
     );
   }
 
@@ -310,12 +311,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_ts = sse_decode_U128(deserializer);
     var var_devId = sse_decode_String(deserializer);
+    var var_devName = sse_decode_String(deserializer);
     var var_rxBytes = sse_decode_u_64(deserializer);
     var var_txBytes = sse_decode_u_64(deserializer);
     var var_statValid = sse_decode_bool(deserializer);
     return NetDevStat(
         ts: var_ts,
         devId: var_devId,
+        devName: var_devName,
         rxBytes: var_rxBytes,
         txBytes: var_txBytes,
         statValid: var_statValid);
@@ -392,6 +395,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_U128(self.ts, serializer);
     sse_encode_String(self.devId, serializer);
+    sse_encode_String(self.devName, serializer);
     sse_encode_u_64(self.rxBytes, serializer);
     sse_encode_u_64(self.txBytes, serializer);
     sse_encode_bool(self.statValid, serializer);

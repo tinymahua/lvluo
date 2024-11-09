@@ -239,12 +239,14 @@ impl SseDecode for crate::api::net_monitor::NetDevStat {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_ts = <u128>::sse_decode(deserializer);
         let mut var_devId = <String>::sse_decode(deserializer);
+        let mut var_devName = <String>::sse_decode(deserializer);
         let mut var_rxBytes = <u64>::sse_decode(deserializer);
         let mut var_txBytes = <u64>::sse_decode(deserializer);
         let mut var_statValid = <bool>::sse_decode(deserializer);
         return crate::api::net_monitor::NetDevStat {
             ts: var_ts,
             dev_id: var_devId,
+            dev_name: var_devName,
             rx_bytes: var_rxBytes,
             tx_bytes: var_txBytes,
             stat_valid: var_statValid,
@@ -315,6 +317,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::net_monitor::NetDevStat {
         [
             self.ts.into_into_dart().into_dart(),
             self.dev_id.into_into_dart().into_dart(),
+            self.dev_name.into_into_dart().into_dart(),
             self.rx_bytes.into_into_dart().into_dart(),
             self.tx_bytes.into_into_dart().into_dart(),
             self.stat_valid.into_into_dart().into_dart(),
@@ -387,6 +390,7 @@ impl SseEncode for crate::api::net_monitor::NetDevStat {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u128>::sse_encode(self.ts, serializer);
         <String>::sse_encode(self.dev_id, serializer);
+        <String>::sse_encode(self.dev_name, serializer);
         <u64>::sse_encode(self.rx_bytes, serializer);
         <u64>::sse_encode(self.tx_bytes, serializer);
         <bool>::sse_encode(self.stat_valid, serializer);

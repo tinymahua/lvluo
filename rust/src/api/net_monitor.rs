@@ -8,6 +8,8 @@ pub struct NetDevStat {
     pub ts: u128,
     #[frb(name = "devId")]
     pub dev_id: String,
+    #[frb(name = "devName")]
+    pub dev_name: String,
     #[frb(name = "rxBytes")]
     pub rx_bytes: u64,
     #[frb(name = "txBytes")]
@@ -20,6 +22,10 @@ pub struct NetDevStat {
 
 #[frb(sync)] // Synchronous mode for simplicity of the demo
 pub fn get_net_dev_stats() -> Result<Vec<NetDevStat>> {
+
+    let devices_name_map = ifstat_net_stats::get_device_string_to_name_map();
+    println!("{:?}", devices_name_map);
+
     let mut dev_stats: Vec<NetDevStat> = Vec::new();
 
     let ts =  SystemTime::now()
@@ -30,11 +36,19 @@ pub fn get_net_dev_stats() -> Result<Vec<NetDevStat>> {
         Ok(stats_map) => {
             // Convert the stats to a C string format and return the pointer
             // convert_stats_to_c(stats_map)
-            // println!("stats_map: {:?}", stats_map);
+            println!("stats_map: {:?}", stats_map);
             stats_map.into_iter().for_each(|(dev_id, (rx_bytes, tx_bytes))| {
-                dev_stats.push(NetDevStat {
-                    ts,
-                    dev_id, rx_bytes, tx_bytes, stat_valid: true});
+                let dev_name = devices_name_map.get(&dev_id);
+                println!("DevName: {:?}", dev_name);
+                match dev_name {
+                    Some(dev_name) => {dev_stats.push(NetDevStat {
+                        ts,
+                        dev_id,
+                        dev_name: String::from(dev_name),
+                        rx_bytes, tx_bytes, stat_valid: true});}
+                    None => {}
+                }
+
             })
         }
         Err(err) => {
