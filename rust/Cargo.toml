@@ -10,7 +10,17 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 flutter_rust_bridge = "=2.5.1"
 anyhow = "1.0.92"
 ifstat-rs = "3.0.0"
+image = "0.25.5"
+libheif-rs = "1.0.2"
 
 [[bin]]
 name = "ifstat-cmd"
 path = "src/bin/ifstat-cmd.rs"
+
+[[bin]]
+name = "image-cmd"
+path = "src/bin/image-cmd.rs"
+
+[[bin]]
+name = "filemgr-cmd"
+path = "src/bin/filemgr-cmd.rs"
